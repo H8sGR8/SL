@@ -23,7 +23,7 @@ def create_surf(width, height, color, hit_box, cords):
 def create_text(content, color, font, cords):
     """
     Creating texts that will be on the screen
-    font = 1 for font1 or 2 for font2
+    font = 1 for font1 or 2 for font2 or 3 for font3
     """
     if font == 1:
         text = font1.render(content, True, color)
@@ -31,6 +31,10 @@ def create_text(content, color, font, cords):
         return text, text_hit_box
     elif font == 2:
         text = font2.render(content, True, color)
+        text_hit_box = text.get_rect(center=cords)
+        return text, text_hit_box
+    elif font == 3:
+        text = font3.render(content, True, color)
         text_hit_box = text.get_rect(center=cords)
         return text, text_hit_box
 
@@ -165,20 +169,30 @@ def show(g):
         screen.blit(ball, ball_hit_box)
     score_text, score_text_hit_box = create_text(f'{o_score}-{p_score}', 'White', 1, (500, 650))
     screen.blit(score_text, score_text_hit_box)
-    if o_score == 5:
+    if o_score == 5 and not player2:
         screen.blit(lose, lose_hit_box)
         pygame.display.update()
         clock.tick(0.25)
         g = False
-    elif p_score == 5:
+    elif p_score == 5 and not player2:
         screen.blit(win, win_hit_box)
+        pygame.display.update()
+        g = False
+        clock.tick(0.25)
+    elif o_score == 5 and player2:
+        screen.blit(left_player, left_player_hit_box)
+        pygame.display.update()
+        clock.tick(0.25)
+        g = False
+    elif p_score == 5 and player2:
+        screen.blit(right_player, right_player_hit_box)
         pygame.display.update()
         g = False
         clock.tick(0.25)
     return g
 
 
-def event(key):
+def event_game(key):
     """
     Quiting a game by clicking X in right corner of pressing escape on keyboard
     Showing and hiding cursor during a game
@@ -247,14 +261,17 @@ if __name__ == "__main__":
     ball, ball_hit_box = create_surf(20, 20, 'White', True, (500, 300))
     font1 = pygame.font.Font(None, 80)
     font2 = pygame.font.Font(None, 200)
+    font3 = pygame.font.Font(None, 120)
     win, win_hit_box = create_text('WINNER', 'White', 2, (500, 300))
     lose, lose_hit_box = create_text('LOOSER', 'White', 2, (500, 300))
+    left_player, left_player_hit_box = create_text('LEFT PLAYER WON', 'White', 3, (500, 300))
+    right_player, right_player_hit_box = create_text('RIGHT PLAYER WON', 'White', 3, (500, 300))
     clock = pygame.time.Clock()
     while True:
         keys = pygame.key.get_pressed()
         screen.blit(table, (0, 0))
         screen.blit(score, (0, 600))
-        event(keys)
+        event_game(keys)
         if game:
             player_hit_box.y += player_movement(keys)
             p_score, o_score, X_movement, Y_movement = point_counter(p_score, o_score, X_movement, Y_movement)
@@ -268,3 +285,4 @@ if __name__ == "__main__":
             player2, game = choose_game_mode(player2, game)
         pygame.display.update()
         clock.tick(60)
+        
