@@ -26,11 +26,11 @@ def create_text(content, color, font, cords):
     font = 1 for font1 or 2 for font2
     """
     if font == 1:
-        text = font1.render(content, False, color)
+        text = font1.render(content, True, color)
         text_hit_box = text.get_rect(center=cords)
         return text, text_hit_box
     elif font == 2:
-        text = font2.render(content, False, color)
+        text = font2.render(content, True, color)
         text_hit_box = text.get_rect(center=cords)
         return text, text_hit_box
 
@@ -178,15 +178,21 @@ def show(g):
     return g
 
 
-def quit_game(key):
+def event(key):
     """
     Quiting a game by clicking X in right corner of pressing escape on keyboard
+    Showing and hiding cursor during a game
     key = key pressed
     """
     for event in pygame.event.get():
         if event.type == pygame.QUIT or key[pygame.K_ESCAPE]:
             pygame.quit()
             exit()
+        if game and pygame.mouse.get_pressed() == (True, False, False):
+            if pygame.mouse.get_visible() == 0:
+                pygame.mouse.set_visible(1)
+            else:
+                pygame.mouse.set_visible(0)
 
 
 def choose_game_mode(p, g):
@@ -209,6 +215,7 @@ def choose_game_mode(p, g):
         pvp, pvp_hit_box = create_text('PvP', color2, 1, (300, 300))
         if pygame.mouse.get_pressed() == (True, False, False):
             pygame.mouse.set_visible(0)
+            clock.tick(4)
             p = True
             g = True
     elif button2_hit_box.collidepoint(mouse_pos):
@@ -216,6 +223,7 @@ def choose_game_mode(p, g):
         pve, pve_hit_box = create_text('PvE', color2, 1, (700, 300))
         if pygame.mouse.get_pressed() == (True, False, False):
             pygame.mouse.set_visible(0)
+            clock.tick(4)
             p = False
             g = True
     screen.blit(button1, button1_hit_box)
@@ -246,7 +254,7 @@ if __name__ == "__main__":
         keys = pygame.key.get_pressed()
         screen.blit(table, (0, 0))
         screen.blit(score, (0, 600))
-        quit_game(keys)
+        event(keys)
         if game:
             player_hit_box.y += player_movement(keys)
             p_score, o_score, X_movement, Y_movement = point_counter(p_score, o_score, X_movement, Y_movement)
