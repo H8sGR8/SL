@@ -51,7 +51,6 @@ def restart_game():
 def player_movement():
     """
     Moving player by pressing arrow up and down
-    key = key pressed
     """
     global keys, player_hit_box
     if (keys[pygame.K_UP] and player_hit_box.top > 0
@@ -67,7 +66,6 @@ def set_ball_movement():
     Changing an angle of ball's velocity after a hit
     Farther from center the ball hits higher the Y velocity (max 6)
     Whole velocity is allways 10
-    x, y = ball's velocities
     """
     global Y_movement, X_movement
     if player_hit_box.colliderect(ball_hit_box):
@@ -91,7 +89,6 @@ def set_ball_movement():
 def wall_bounce():
     """
     After hitting a top or bottom wall bouncing off with the same angle
-    y = ball's Y velocity
     """
     global Y_movement
     if ball_hit_box.bottom > 600 or ball_hit_box.top < 0:
@@ -101,7 +98,6 @@ def wall_bounce():
 def ball_movement():
     """
     Changing position of a ball using date from previous functions
-    x, y = exact ball's cords
     """
     global ball_hit_box
     if p_score < 5 and o_score < 5:
@@ -113,8 +109,6 @@ def point_counter():
     """
     After hitting left or right wall giving points to player or to opponent
     Resetting game to starting point using function
-    o_s, p_s = places for scores
-    x, y ball's velocities
     """
     global p_score, o_score, X_movement, Y_movement
     if ball_hit_box.left < 0:
@@ -136,8 +130,6 @@ def opponent_movement():
     Moving opponent by forcing it to follow a ball
     when Y position goes 20px away from center
     While ball has low Y velocity opponent will also reduce it not to glitch
-    y = ball's Y velocity
-    p = choosing between playing against AI or another player
     """
     global opponent_hit_box, Y_movement, keys, player2
     if player2:
@@ -170,7 +162,6 @@ def opponent_movement():
 def show():
     """
     Showing  all essential graphics to the game
-    g = changing game status on false to choose game mode again
     """
     if o_score < 5 and p_score < 5:
         screen.blit(player, player_hit_box)
@@ -181,27 +172,30 @@ def show():
     screen.blit(score_text, score_text_hit_box)
     if o_score == 5 and not player2:
         screen.blit(lose, lose_hit_box)
+        screen.blit(menu, menu_hit_box)
         pygame.display.update()
     elif p_score == 5 and not player2:
         screen.blit(win, win_hit_box)
+        screen.blit(menu, menu_hit_box)
         pygame.display.update()
     elif o_score == 5 and player2:
         screen.blit(left_player, left_player_hit_box)
+        screen.blit(menu, menu_hit_box)
         pygame.display.update()
     elif p_score == 5 and player2:
         screen.blit(right_player, right_player_hit_box)
+        screen.blit(menu, menu_hit_box)
         pygame.display.update()
 
 
-def event_game(key):
+def event_game():
     """
     Quiting a game by clicking X in right corner of pressing escape on keyboard
     Showing and hiding cursor during a game
-    key = key pressed
     """
-    global game
+    global game, keys
     for event in pygame.event.get():
-        if event.type == pygame.QUIT or key[pygame.K_ESCAPE]:
+        if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:
             pygame.quit()
             exit()
         if game:
@@ -210,7 +204,7 @@ def event_game(key):
                     pygame.mouse.set_visible(1)
                 else:
                     pygame.mouse.set_visible(0)
-            if key[pygame.K_SPACE]:
+            if keys[pygame.K_SPACE]:
                 game = False
 
 
@@ -218,8 +212,8 @@ def choose_game_mode():
     """
     Choosing between PvP and PvE mode
     changing colors of buttons when cursor is on them
-    Starting game
-    p = False to PvE mode and True for PvP mode
+    Starting game if game = True
+    player2 = False to PvE mode and True for PvP mode
     """
     global player2, game
     button1.fill((150, 150, 150))
@@ -250,6 +244,7 @@ def choose_game_mode():
     screen.blit(pvp, pvp_hit_box)
     screen.blit(button2, button2_hit_box)
     screen.blit(pve, pve_hit_box)
+    screen.blit(escape, escape_hit_box)
 
 
 if __name__ == "__main__":
@@ -272,6 +267,10 @@ if __name__ == "__main__":
     font3 = pygame.font.Font(None, 120)
     win, win_hit_box = create_text('WINNER', 'White', 2, (500, 300))
     lose, lose_hit_box = create_text('LOOSER', 'White', 2, (500, 300))
+    menu, menu_hit_box = (
+        create_text('SPACE TO ENTER MENU', 'White', 1, (500, 450)))
+    escape, escape_hit_box = (
+        create_text('ESC TO QUITE GAME', 'White', 1, (500, 450)))
     left_player, left_player_hit_box = (
         create_text('LEFT PLAYER WON', 'White', 3, (500, 300)))
     right_player, right_player_hit_box = (
@@ -281,7 +280,7 @@ if __name__ == "__main__":
         keys = pygame.key.get_pressed()
         screen.blit(table, (0, 0))
         screen.blit(score, (0, 600))
-        event_game(keys)
+        event_game()
         if game:
             player_movement()
             point_counter()
